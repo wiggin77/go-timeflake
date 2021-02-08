@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"math/big"
-	"math/rand"
 	"reflect"
 	"testing"
 	"time"
@@ -44,7 +43,8 @@ func TestTimeflakeCreationFromB62(t *testing.T) {
 
 func TestTimeflakeValuesInstanceCanBeCreated(t *testing.T) {
 	now := int64(1611829003)
-	v := timeflake.NewValues(now, nil)
+	v, _ := timeflake.NewValues(now, nil)
+
 	tf, err := timeflake.FromValues(v)
 
 	if err != nil {
@@ -69,7 +69,7 @@ func TestTimeflakeCreationFromValuesFails(t *testing.T) {
 	randString := "0"
 	random, _ := bigFromString(randString, 10)
 
-	v := timeflake.NewValues(now, random)
+	v, _ := timeflake.NewValues(now, random)
 	_, err := timeflake.FromValues(v)
 
 	if err == nil {
@@ -83,7 +83,7 @@ func TestTimeflakeInstance(t *testing.T) {
 	randString := "985318938706034770822415"
 	random, _ := bigFromString(randString, 10)
 
-	v := timeflake.NewValues(now, random)
+	v, _ := timeflake.NewValues(now, random)
 	tf, err := timeflake.FromValues(v)
 
 	if err != nil {
@@ -234,8 +234,4 @@ func TestRandomnessOfTimeflakes(t *testing.T) {
 			seen[r.Base62] = j
 		}
 	}
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
 }

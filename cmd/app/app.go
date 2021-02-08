@@ -45,7 +45,11 @@ func (m *Main) Run() error {
 			if r == nil {
 				return errors.New("can not parse random number")
 			}
-			v := timeflake.NewValues(m.Timestamp, r)
+			var v timeflake.Values
+			v, err = timeflake.NewValues(m.Timestamp, r)
+			if err != nil {
+				return err
+			}
 
 			tf, err = timeflake.FromValues(v)
 			if err != nil {
@@ -54,7 +58,11 @@ func (m *Main) Run() error {
 			tf.Log()
 			return nil
 		} else {
-			v := timeflake.NewValues(m.Timestamp, nil)
+			var v timeflake.Values
+			v, err = timeflake.NewValues(m.Timestamp, nil)
+			if err != nil {
+				return err
+			}
 			tf, err = timeflake.FromValues(v)
 			if err != nil {
 				return err

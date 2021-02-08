@@ -2,11 +2,11 @@ package timeflake
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/binary"
 	"errors"
 	"fmt"
 	"math/big"
-	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
@@ -103,7 +103,9 @@ func Random() (*Timeflake, error) {
 
 	//Generate cryptographically strong pseudo-random between 0 - max
 	p := make([]byte, 10) // 80bits
-	rand.Read(p)
+	if _, err := rand.Read(p); err != nil {
+		return nil, err
+	}
 
 	randomPart := new(big.Int)
 	randomPart.SetBytes(p)
@@ -243,16 +245,18 @@ func (v *valuesParam) Random() *big.Int {
 	return v.r
 }
 
-func NewValues(timestamp int64, random *big.Int) Values {
+func NewValues(timestamp int64, random *big.Int) (Values, error) {
 	if random == nil {
 		//Generate cryptographically strong pseudo-random between 0 - max
 		p := make([]byte, 10)
-		rand.Read(p)
+		if _, err := rand.Read(p); err != nil {
+			return nil, err
+		}
 
 		random = new(big.Int)
 		random.SetBytes(p)
 	}
-	return &valuesParam{timestamp, random} // enforce the default value here
+	return &valuesParam{timestamp, random}, nil // enforce the default value here
 }
 
 func FromValues(v Values) (*Timeflake, error) {
